@@ -317,8 +317,9 @@ class NYTimes(BasicNewsRecipe):
                 .image {text-align: center;}
                 .aside {color:blue;margin:0px 0px 0px 0px; padding: 0px 0px 0px 0px; font-size:100%;}
                 .asidenote {color:blue;margin:0px 0px 0px 0px; padding: 0px 0px 0px 0px; font-size:100%;font-weight:bold;}
-                .source {text-align: left; font-size: x-small; }'''
-
+                .source {text-align: left; font-size: x-small;}
+                p {margin-bottom: 0; text-indent: 1.5em; margin-top: 0}
+		'''
     articles = {}
     key = None
     ans = []
