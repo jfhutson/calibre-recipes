@@ -33,12 +33,12 @@ class FirstThings(BasicNewsRecipe):
         
     def get_browser(self):
         br = BasicNewsRecipe.get_browser(self)
-#        if self.username is not None and self.password is not None:
-        br.open('https://www.firstthings.com/current-edition#login')
-        br.select_form(nr=4)
-        br['username'] = 'jfhutson@gmail.com'
-        br['password'] = 'asauce22'
-        br.submit().read()
+        if self.username is not None and self.password is not None:
+            br.open('https://www.firstthings.com/current-edition#login')
+            br.select_form(nr=4)
+            br['username'] = self.username
+            br['password'] = self.password
+            br.submit().read()
         return br
 
     def preprocess_raw_html(self, raw, url):
