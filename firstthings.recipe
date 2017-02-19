@@ -21,8 +21,7 @@ class FirstThings(BasicNewsRecipe):
 
     keep_only_tags = [
         dict(name='h1'),
-        dict(attrs={'itemprop': ['author',]}),
-        dict(attrs={'itemprop': 'articleBody'}),
+        dict(attrs={'itemprop': ['author', 'articleBody',]}),
         ]
         
     extra_css = '''
