@@ -6,11 +6,14 @@ __copyright__ = '2008, Kovid Goyal <kovid at kovidgoyal.net>'
 import html5lib
 from lxml import html
 from calibre.web.feeds.news import BasicNewsRecipe
+from mechanize import Request
+import json
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
 
 class FirstThings(BasicNewsRecipe):
 
     title = 'First Things'
-    __author__ = 'John Hutson'
+    __author__ = 'Kovid Goyal'
     description = 'America\'s Most Influential Journal of Religion and Public Life'
     INDEX = 'https://www.firstthings.com/current-edition'
     language = 'en'
@@ -21,21 +24,35 @@ class FirstThings(BasicNewsRecipe):
 
     keep_only_tags = [
         dict(name='h1'),
-        dict(attrs={'itemprop': ['author', 'articleBody',]}),
+        dict(attrs={'itemprop': ['author',]}),
+        dict(attrs={'itemprop': 'articleBody'}),
         ]
         
     extra_css = '''
         .small-caps { font-variant: small-caps }
-        .drop-cap { float: left; font-size: 75px; line-height: 60px; padding-top: 4px; padding-right: 8px; padding-left: 3px;}
+        .drop-cap { float: left; font-family: Georgia; font-size: 75px; line-height: 60px; padding-top: 4px; padding-right: 8px; padding-left: 3px;}
         '''
 
     def get_browser(self):
-        br = BasicNewsRecipe.get_browser(self)
-        br.open('https://www.firstthings.com/current-edition#login')
-        br.select_form(nr=4)
-        br['username'] = self.username
-        br['password'] = self.password
-        br.submit()
+        br = BasicNewsRecipe.get_browser(self, user_agent=USER_AGENT)
+        url = 'https://www.firstthings.com/current-edition'
+        br.open(url).read()
+        rurl = 'https://www.firstthings.com/ajax/login'
+        rq = Request(rurl, headers={
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Language': 'en-US,en;q=0.8',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Referer': url,
+            'X-HTTP-Method-Override': 'POST',
+            'X-Requested-With': 'XMLHttpRequest',
+			'Connection': 'keep-alive'
+        }, data=json.dumps({
+            'username': self.username,
+            'password': self.password,
+        }))
+        r = br.open(rq)
+        if r.code != 200:
+            raise ValueError('Failed to login, check username and password')
         return br
         
     def preprocess_raw_html(self, raw, url):
